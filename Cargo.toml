@@ -1,0 +1,37 @@
+[package]
+name = "simple-auth-tool"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Detect fingerprint and face sensors on Linux and set up fprintd, python-validity and Howdy for them"
+license = "MIT"
+readme = "README.md"
+
+[dependencies]
+gtk = { package = "gtk4", version = "0.8", features = ["v4_14"] }
+adw = { package = "libadwaita", version = "0.6", features = ["v1_5"] }
+zbus = "4"
+futures-util = "0.3"
+async-channel = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+anyhow = "1"
+log = "0.4"
+env_logger = "0.11"
+
+[profile.release]
+lto = true
+strip = true
+
+[package.metadata.deb]
+maintainer = "simple-auth-tool contributors"
+section = "admin"
+depends = "$auto, policykit-1 | pkexec"
+extended-description = "A small GTK4/libadwaita front end that detects fingerprint readers and IR cameras, installs the right backend (fprintd, open-fprintd + python-validity, Howdy), enrolls fingerprints and faces and toggles them in PAM via pam-auth-update. It never implements authentication itself."
+assets = [
+    ["target/release/simple-auth-tool", "usr/bin/", "755"],
+    ["data/simple-auth-tool.desktop", "usr/share/applications/", "644"],
+    ["data/io.github.simple_auth_tool.policy", "usr/share/polkit-1/actions/", "644"],
+    ["README.md", "usr/share/doc/simple-auth-tool/", "644"],
+]

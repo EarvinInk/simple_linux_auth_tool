@@ -1,0 +1,52 @@
+# Fingerprint sensors that need something other than stock libfprint, or that
+# deserve a friendlier name. Anything not listed here is looked up at runtime in
+# libfprint's udev hwdb (60-autosuspend-fingerprint-reader.hwdb), which lists
+# every sensor libfprint supports plus a "known unsupported" section.
+#
+# A user file at ~/.config/simple-auth-tool/devices.toml with the same format
+# is read first and wins over these entries (it cannot add installable packages;
+# the privileged helper only trusts its built-in allowlist).
+#
+#   usb      = "vvvv:pppp" (hex, lower case)
+#   backend  = "libfprint" | "python-validity" | "unsupported"
+#   validity = "ppa"   -> packages from ppa:uunicorn/open-fprintd
+#              "local" -> run python-validity from a source checkout (forks that
+#                         support sensors upstream does not)
+
+[[device]]
+usb = "138a:0090"
+name = "Validity VFS7500 (Lenovo ThinkPad)"
+backend = "python-validity"
+validity = "ppa"
+
+[[device]]
+usb = "138a:0097"
+name = "Validity VFS495 (Lenovo ThinkPad)"
+backend = "python-validity"
+validity = "ppa"
+
+[[device]]
+usb = "138a:009d"
+name = "Validity sensor (Lenovo ThinkPad)"
+backend = "python-validity"
+validity = "ppa"
+
+[[device]]
+usb = "06cb:009a"
+name = "Synaptics Metallica MIS (ThinkPad T480/X1)"
+backend = "python-validity"
+validity = "ppa"
+
+[[device]]
+usb = "138a:00ab"
+name = "Validity sensor 0xd51 (HP EliteBook 840 G5)"
+backend = "python-validity"
+validity = "local"
+notes = "Not supported by upstream python-validity; needs a checkout of a fork with 0xd51 support."
+
+[[device]]
+usb = "06cb:00b7"
+name = "Synaptics FM-115 (HP G6 series)"
+backend = "python-validity"
+validity = "local"
+notes = "Not supported by upstream python-validity; needs a checkout of a fork with 0xd51 support."

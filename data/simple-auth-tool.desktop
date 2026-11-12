@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Fingerprint & Face Login
+GenericName=Authentication Setup
+Comment=Set up fingerprint readers and face unlock (fprintd, python-validity, Howdy)
+Exec=simple-auth-tool
+Icon=auth-fingerprint-symbolic
+Terminal=false
+Categories=Settings;System;Security;GTK;
+Keywords=fingerprint;face;howdy;fprintd;pam;login;biometric;
+StartupNotify=true
