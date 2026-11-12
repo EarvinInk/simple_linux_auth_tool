@@ -52,13 +52,43 @@ cargo run -- --detect            # JSON report of what was detected, no UI
 
 ## Install
 
+Download the latest `.deb` and install it with apt, which also pulls in the dependencies.
+Ubuntu 24.04+, Linux Mint 22+, Pop!_OS 24.04 and Debian 13 work; it needs
+libadwaita ≥ 1.5.
+
 ```bash
-cargo install cargo-deb && cargo deb && sudo apt install ./target/debian/simple-auth-tool_*.deb
+wget https://github.com/EarvinInk/simple_linux_auth_tool/releases/latest/download/simple-auth-tool_amd64.deb
+sudo apt install ./simple-auth-tool_amd64.deb
 ```
 
-This installs the binary, a `.desktop` entry and a polkit policy, so the password
-prompt says what it's for. Running from `target/` works too; pkexec then shows its
-generic prompt.
+It then appears in the menu as **Fingerprint & Face Login**. To remove it:
+`sudo apt remove simple-auth-tool`.
+
+The package installs the binary, a `.desktop` entry and a polkit policy, so the
+password prompt says what it's for.
+
+### Build the package yourself
+
+```bash
+sudo apt install libgtk-4-dev libadwaita-1-dev
+cargo install cargo-deb
+cargo deb                                   # -> target/debian/simple-auth-tool_<ver>-1_amd64.deb
+sudo apt install ./target/debian/simple-auth-tool_*.deb
+```
+
+### Making a release
+
+CI ([.github/workflows/release.yml](.github/workflows/release.yml)) lints, tests and
+builds the `.deb` on every push. To publish a release, bump `version` in
+`Cargo.toml`, commit, then push a matching tag:
+
+```bash
+git tag v0.1.0 && git push origin v0.1.0
+```
+
+The workflow attaches the versioned `.deb`, a fixed-name `simple-auth-tool_amd64.deb`
+(what the `latest/download` link above points to) and `SHA256SUMS` to the release.
+To offer it on your own website, link to that `latest/download` URL.
 
 ## Privilege model
 

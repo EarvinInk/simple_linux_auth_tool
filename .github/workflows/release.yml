@@ -1,0 +1,73 @@
+# Build the .deb on every push/PR; on a "v*" tag, publish it as a GitHub Release.
+#
+#   git tag v0.1.0 && git push origin v0.1.0
+#
+# The release carries two copies of the package:
+#   simple-auth-tool_<version>-1_amd64.deb   versioned, for archives
+#   simple-auth-tool_amd64.deb               stable name, so this link always
+#                                            gets the newest release:
+#   https://github.com/<owner>/<repo>/releases/latest/download/simple-auth-tool_amd64.deb
+name: build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  deb:
+    # 24.04 is the oldest Ubuntu with libadwaita 1.5. Packages built here
+    # also install on Linux Mint 22.x, Pop!_OS 24.04 and Debian 13.
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libgtk-4-dev libadwaita-1-dev
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Lint and test
+        run: |
+          cargo clippy --all-targets -- -D warnings
+          cargo test
+
+      - name: Check tag matches Cargo.toml version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          crate=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')
+          test "v$crate" = "$GITHUB_REF_NAME" || { echo "Tag $GITHUB_REF_NAME != Cargo.toml version $crate"; exit 1; }
+
+      - name: Build .deb
+        run: |
+          cargo install cargo-deb --locked
+          cargo deb
+          cp target/debian/*.deb target/debian/simple-auth-tool_amd64.deb.tmp
+          mv target/debian/simple-auth-tool_amd64.deb.tmp target/debian/simple-auth-tool_amd64.deb
+          (cd target/debian && sha256sum *.deb > SHA256SUMS)
+          ls -l target/debian
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deb
+          path: |
+            target/debian/*.deb
+            target/debian/SHA256SUMS
+
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" target/debian/*.deb target/debian/SHA256SUMS \
+            --title "$GITHUB_REF_NAME" --generate-notes
