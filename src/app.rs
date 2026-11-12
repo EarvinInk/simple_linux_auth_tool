@@ -167,6 +167,14 @@ fn build_window(app: &adw::Application) {
         }
     });
 
+    // Every UI callback holds only a Weak<Ctx>; the window owns the one strong
+    // reference, so the state lives exactly as long as the window.
+    let keep_alive = RefCell::new(Some(ctx.clone()));
+    window.connect_close_request(move |_| {
+        keep_alive.take();
+        glib::Propagation::Proceed
+    });
+
     window.present();
     ctx.refresh();
 }
