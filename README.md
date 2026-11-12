@@ -13,6 +13,17 @@ project's own tools to enroll you and turn it on for login:
 | IR camera (or a webcam, with a warning) | [Howdy](https://github.com/boltgolt/howdy) |
 | Login, sudo, lock screen | `pam-auth-update` profiles `fprintd` / `howdy` |
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/overview.png" width="560" alt="Overview: detected fingerprint reader and IR camera, each with its status">
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/fingerprint.png" width="400" alt="Fingerprint page: driver source, profile and enrolled fingers">
+  <img src="docs/screenshots/face.png" width="400" alt="Face page: Howdy camera choice, profile and face models">
+</p>
+
 ## What it does
 
 1. **Detects** USB fingerprint readers (sysfs) and V4L2 cameras, marking IR ones.
